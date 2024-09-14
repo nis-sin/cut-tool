@@ -7,6 +7,10 @@
 #include <ctype.h>
 #include <math.h>
 
+struct node {
+    unsigned int field;
+    struct node* next;
+};
 
 int main(int argc, char* argv[]) {
 
@@ -49,10 +53,9 @@ int main(int argc, char* argv[]) {
     unsigned int maxLength = strlen(fieldString);
     unsigned int field; 
     unsigned int length; 
-    unsigned int fields[maxLength];
-    unsigned int index = 0;
-
-    memset(fields, 0, maxLength * sizeof(int));
+    struct node* fieldsHead = NULL;
+    struct node* fieldsTail = NULL;
+    struct node* currentNode = NULL;
 
     while (strptr < maxLength){
         field = strtol(fieldString, NULL, 10);
@@ -63,20 +66,35 @@ int main(int argc, char* argv[]) {
         }
 
         length = floor(log10(field)) + 1;
-        fields[index] = field;
 
-        index++;
+        if (fieldsHead == NULL){
+            fieldsHead = (struct node*) malloc(sizeof(struct node));
+            fieldsHead->field = field;
+            fieldsHead->next = NULL;
+            fieldsTail = fieldsHead;
+        }
+        else {
+            currentNode = (struct node*) malloc(sizeof(struct node));
+            currentNode->field = field;
+            currentNode->next = NULL;
+            fieldsTail->next = currentNode;
+            fieldsTail = currentNode;
+        }
+
         fieldString += length+1;
         strptr += length+1;
     }
 
-    for (int i = 0; i < maxLength; i++){
-        printf("%d\n", fields[i]);
+    currentNode = fieldsHead;
+    while (currentNode != NULL){
+        printf("%d\n", currentNode->field);
+        currentNode = currentNode->next;
     }
 
     return 0;
 
     // Read file and print characters
+
     while ((c = fgetwc(fp)) != WEOF) {
 
         if (foption == 1){
