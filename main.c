@@ -65,16 +65,30 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
+        if (field < 0){
+            printf("Fields are numbered from 1\n");
+            return 1;
+        }
+
         length = floor(log10(field)) + 1;
 
+        // linked list to store fields
         if (fieldsHead == NULL){
             fieldsHead = (struct node*) malloc(sizeof(struct node));
+            if (fieldsHead == NULL){
+                printf("Memory allocation failed\n");
+                return 1;
+            }
             fieldsHead->field = field;
             fieldsHead->next = NULL;
             fieldsTail = fieldsHead;
         }
         else {
             currentNode = (struct node*) malloc(sizeof(struct node));
+            if (currentNode == NULL){
+                printf("Memory allocation failed\n");
+                return 1;
+            }
             currentNode->field = field;
             currentNode->next = NULL;
             fieldsTail->next = currentNode;
@@ -85,21 +99,18 @@ int main(int argc, char* argv[]) {
         strptr += length+1;
     }
 
-    currentNode = fieldsHead;
-    while (currentNode != NULL){
-        printf("%d\n", currentNode->field);
-        currentNode = currentNode->next;
-    }
-
-    return 0;
-
     // Read file and print characters
 
     while ((c = fgetwc(fp)) != WEOF) {
 
         if (foption == 1){
-            if ((fieldString - 1) == tabCount){
-                printf("%lc", c);
+            currentNode = fieldsHead;
+            while (currentNode != NULL){
+                if ((currentNode->field-1) == tabCount){
+                    printf("%lc", c);
+                    break;
+                }
+                currentNode = currentNode->next;
             }
         }
         else {
@@ -114,4 +125,15 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+
+    struct node* temp;
+    currentNode = fieldsHead;
+    while (currentNode != NULL){
+        temp = currentNode->next;
+        free(currentNode);
+        currentNode = temp;
+    }
+
+    fclose(fp);
+    return 0;
 }
