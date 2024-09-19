@@ -1,3 +1,6 @@
+// TODO: implement -d option feature
+// TODO: accept input from stdin
+
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
@@ -27,19 +30,23 @@ int main(int argc, char* argv[]) {
 
     FILE* fp = fopen(fileName, "r");
 
-    wint_t c;
-    char* fieldString;
     int arg;
     int foption = 0;
-    unsigned int tabCount = 0;
-    char t;
+    int doption = 0;
+    char delimiter = '\t';
+    int delimiterIndex = -1;
+    char* fieldString = "";
 
     // Parse command line arguments
-    while ((arg = getopt(argc, argv, "-f")) != -1){
+    while ((arg = getopt(argc, argv, "-fd")) != -1){
         switch (arg){
             case 'f':
                 foption = 1;
                 fieldString = argv[optind];
+                break;
+            case 'd':
+                doption = 1;
+                delimiterIndex = optind;
                 break;
             case '?':
                 printf("error\n");
@@ -101,6 +108,14 @@ int main(int argc, char* argv[]) {
 
     // Read file and print characters
 
+    wint_t c;
+    char* strC;
+    unsigned int tabCount = 0;
+
+    if (doption == 1){
+        delimiter = argv[delimiterIndex][0];
+    }
+
     while ((c = fgetwc(fp)) != WEOF) {
 
         if (foption == 1){
@@ -117,15 +132,18 @@ int main(int argc, char* argv[]) {
             printf("%lc", c);
         }
 
-        if (iswspace(c)) {
+
+        if (c == L'\n'){
+            tabCount = 0;
+            printf("\n");
+        }
+
+        if (delimiter == c) {      // change here to check for delimiter
             tabCount++;
-            if (c == L'\n'){
-                tabCount = 0;
-                printf("\n");
-            }
         }
     }
 
+    // free memory and close file
     struct node* temp;
     currentNode = fieldsHead;
     while (currentNode != NULL){
