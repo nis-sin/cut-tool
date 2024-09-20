@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     struct stat64 buf;
     FILE* fp;
 
-    if (fileName[0] == '-' || strcmp(fileName,argv[0]) == 0){
+    if (fileName[0] == '-' || strcmp(fileName, argv[optind-1]) == 0){
         fp = stdin;
     }
     else {
