@@ -1,6 +1,3 @@
-// TODO: implement -d option feature
-// TODO: accept input from stdin
-
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
@@ -19,17 +16,7 @@ int main(int argc, char* argv[]) {
 
     setlocale(LC_ALL, "");
 
-    char* fileName = argv[argc - 1];
-    struct stat64 buf;
-
-    // Check if file exists
-    if (stat64(fileName, &buf) == -1){
-        printf("File does not exist\n");
-        return 1;
-    }
-
-    FILE* fp = fopen(fileName, "r");
-
+    // Obtain the option values
     int arg;
     int foption = 0;
     int doption = 0;
@@ -50,16 +37,35 @@ int main(int argc, char* argv[]) {
                 break;
             case '?':
                 printf("error\n");
+                return 1;
                 break;
         }
+    }
+
+    // Set file pointer
+    char* fileName = argv[argc - 1];
+    struct stat64 buf;
+    FILE* fp;
+
+    if (fileName[0] == '-' || strcmp(fileName,argv[0]) == 0){
+        fp = stdin;
+    }
+    else {
+        // Check if file exists
+        if (stat64(fileName, &buf) == -1){
+            printf("File does not exist\n");
+            return 1;
+        }
+        
+        fp = fopen(fileName, "r");
     }
 
     // Parse fields string to obtain the fields number
 
     unsigned int strptr = 0;
     unsigned int maxLength = strlen(fieldString);
-    unsigned int field; 
-    unsigned int length; 
+    unsigned int field;
+    unsigned int length;
     struct node* fieldsHead = NULL;
     struct node* fieldsTail = NULL;
     struct node* currentNode = NULL;
